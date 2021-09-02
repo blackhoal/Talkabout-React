@@ -2,11 +2,20 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import ApiService from "../../ApiService";
 
+import Table from '@material-ui/core/Table'
+import TableBody from '@material-ui/core/TableBody'
+import TableCell from '@material-ui/core/TableCell'
+import TableHead from '@material-ui/core/TableHead'
+import TableRow from '@material-ui/core/TableRow'
+import Button from '@material-ui/core/Button'
+import Typography from '@material-ui/core/Typography'
+import CreateIcon from '@material-ui/icons/Create'
+import DeleteIcon from '@material-ui/icons/Delete'
+
 import Pagination from './NoticePaging'
 import { paginate } from './paginate';
 
 import '../../css/bootstrap.css'
-// import { Button } from '@material-ui/core';
 
 class NoticeListComponent extends Component {
 
@@ -26,10 +35,10 @@ class NoticeListComponent extends Component {
             searchKeyword : "",
             pageSize : 5,
             currentPage: 1,
-            loginInfo : null,
             message : null 
         };
         this.handleSubmit = this.handleSubmit.bind(this);
+
     }
 
     /*
@@ -43,12 +52,14 @@ class NoticeListComponent extends Component {
     }
 
     reloadNoticeList = () => {
+      console.log("reloadNoticeList 시험중",this.state.filteredData);
+      // filteredData == null
       if(this.state.filteredData.length === 0 ) {
+        console.log("filteredData는 널이다");
         ApiService.fetchNotices()
             .then( res => {
                 this.setState({
                   notices: res.data.notices,
-                  loginInfo: res.data.loginInfo,
                 })
             })
             .catch(err => {
@@ -56,6 +67,7 @@ class NoticeListComponent extends Component {
         })
       }
       else {
+        console.log("filteredData에 먼가 들어있다");
         this.setState({
           notices: this.state.filteredData,
           filteredData : null,
@@ -88,7 +100,6 @@ class NoticeListComponent extends Component {
 
         this.setState({
           searchKeyword:"",
-          currentPage:1,
         })
     }
 
@@ -100,8 +111,7 @@ class NoticeListComponent extends Component {
 
     addNotice = () => {
       window.localStorage.removeItem("noticeNo");
-      // this.props.history.push('/add-notice');
-      this.props.history.push('./notice/write');
+      this.props.history.push('/add-notice');
     }
 
     /*
@@ -112,8 +122,7 @@ class NoticeListComponent extends Component {
 
     editNotice = (noticeNo) => {
         window.localStorage.setItem("noticeNo", noticeNo);
-        // this.props.history.push('/edit-notice');
-        this.props.history.push('./notice/modify');
+        this.props.history.push('/edit-notice');
     }
 
     /*
@@ -137,7 +146,7 @@ class NoticeListComponent extends Component {
     }
 
     render(){
-      const count = this.state.notices.length;
+      const count = this.state.notices.length
       
       const pagingNotice = {
         notices:this.state.notices,
@@ -147,54 +156,81 @@ class NoticeListComponent extends Component {
 
       const pagedNotice = paginate(pagingNotice.notices, pagingNotice.currentPage, pagingNotice.pageSize);
       return(
+        <div>
+          <Typography variant="h4" style={style}>공지사항</Typography>
+          <Button variant="contained" color="primary" onClick={this.addNotice}> Add Notice </Button>
+          <form onSubmit={this.handleSubmit} style={{ margin: '0 auto', marginTop: '5%' }}>
+            <label>Search:</label>
+            <input
+              placeholder="검색할 단어를 입력하세요"
+              value={this.state.searchKeyword}
+              onChange={this.handleChange}
+              name="searchKeyword"
+            />
+            <button type="submit">검색</button>
+          </form>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>게시글 번호</TableCell>
+                <TableCell>게시글 종류</TableCell>
+                <TableCell align="center">제목</TableCell>
+                <TableCell align="center">작성일</TableCell>
+                <TableCell align="center">조회수</TableCell>
+                <TableCell align="center">작성자</TableCell>
+                <TableCell align="center">Edit</TableCell>
+                <TableCell align="center">Delete</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {pagedNotice.map( (notice, index) =>
+              // {this.state.notices.map( notice => 
+                <TableRow key={notice.notice_no}>
+                  <TableCell component="th" scope="notice">{(this.state.currentPage-1)*this.state.pageSize + index + 1}</TableCell>
+                  <TableCell align="center">{notice.notice_type}</TableCell>
+                  <TableCell align="center">
+                    <Link to={`/notices/${notice.notice_no}`}>{ notice.notice_title }</Link>
+                  </TableCell>
+                  <TableCell align="center">{notice.notice_date}</TableCell>
+                  <TableCell align="center">{notice.notice_views}</TableCell>
+                  <TableCell align="center">{notice.notice_admin}</TableCell>
+                  <TableCell align="center" onClick={()=> this.editNotice(notice.notice_no)}>
+                    <CreateIcon />
+                  </TableCell>
+                  <TableCell align="center" onClick={()=> this.deleteNotice(notice.notice_no)}>
+                    <DeleteIcon />
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
           <div className= "container" style={{ marginTop: '5%' }}>
-            <h2 style = {{ display: 'flex',justifyContent: 'center'}}>공지사항</h2>
-            
-            {/* <Button variant="contained" color="primary" onClick={this.addNotice}> Add Notice </Button> */}
-            <form onSubmit={this.handleSubmit} style={{ display:'flex', justifyContent:'flex-end	', margin: '0 auto', marginTop: '5%' }}>
-              <input
-                size='25'
-                placeholder="검색할 단어를 입력하세요"
-                value={this.state.searchKeyword}
-                onChange={this.handleChange}
-                name="searchKeyword"
-                style = {{ marginRight:'5px' }}
-              />
-              <button className='btn btn-sm btn-primary' type="submit">검색</button>
-            </form>
+            <h2>공지사항</h2>
             <div style={{  }}>
-              <table className="table table-hover" style={{ textalign: 'center', marginTop: '10px'}}>
+              <table class="table table-hover" style={{ textalign: 'center', marginTop: '10px'}}>
                 <thead>
                   <tr className="table-primary">
-                    <th>번호</th>
-                    <th>타입</th>
+                    <th style={{ width: '10%' }}>번호</th>
+                    <th style={{ width: '10%' }}>타입</th>
                     <th>제목</th>
                     <th>작성일</th>
                     <th>조회수</th>
                     <th>작성자</th>
-                    {/* <th>Edit</th>
-                    <th>Delete</th> */}
+                    <th>Edit</th>
+                    <th>Delete</th>
                   </tr>
                 </thead>
                 <tbody>
                   {pagedNotice.map( (notice, index) =>
                     <tr className="data1" key={notice.notice_no}>
-                      <td className="board_no">{(this.state.currentPage-1)*this.state.pageSize + index + 1}</td>
+                      <td className="board_no" style={{ width: '5%' }}>{(this.state.currentPage-1)*this.state.pageSize + index + 1}</td>
                       <td className="board_type">{notice.notice_type}</td>
                       <td className="board_title">
-                        {/* <Link to={`/notices/${notice.notice_no}`}>{ notice.notice_title }</Link> */}
-                        {/* <Link to={`notice/${notice.notice_no}`} state={ loginInfo }>{ notice.notice_title }</Link>  */}
-                        <Link to={{ pathname: `notice/${notice.notice_no}`, state: { loginInfo: this.state.loginInfo } }}>{ notice.notice_title }</Link> 
+                        <Link to={`/notices/${notice.notice_no}`}>{ notice.notice_title }</Link>
                       </td>
                       <td className="board_date">{notice.notice_date}</td>
                       <td className="board_views">{notice.notice_views}</td>
                       <td className="board_mem">{notice.notice_admin}</td>
-                      {/* <td>
-                        <Button variant="contained" color="primary" onClick={()=> this.editNotice(notice.notice_no)}> Edit </Button>
-                      </td>
-                      <td>
-                        <Button variant="contained" color="primary" onClick={()=> this.deleteNotice(notice.notice_no)}> Delete </Button>
-                      </td> */}
                     </tr>
                   )}
 							  </tbody>
@@ -207,8 +243,14 @@ class NoticeListComponent extends Component {
           />
             </div>
           </div>
+        </div>
       )
     }
+}
+
+const style = {
+  display: 'flex',
+  justifyContent: 'center'
 }
 
 export default NoticeListComponent;

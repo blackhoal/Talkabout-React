@@ -1,14 +1,7 @@
 import React, { Component } from 'react';
 import ApiService from "../../ApiService";
 
-import InputLabel from "@material-ui/core/InputLabel";
-import MenuItem from "@material-ui/core/MenuItem";
-import FormControl from "@material-ui/core/FormControl";
-import Select from "@material-ui/core/Select";
-
-import TextField from '@material-ui/core/TextField';
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
+// import '../../css/NoticeModify.css'
 
 class AddNoticeComponent extends Component{
 
@@ -57,54 +50,42 @@ class AddNoticeComponent extends Component{
 
   render(){
     return(
-      <div>
-        <Typography variant="h4" style={style}>Add Notice</Typography>
-        <form style={formContainer}>
+      <div className="container">
+        <h2 style = {{ display : 'flex', justifyContent : 'center', marginTop:'5px' }}>Add Notice</h2>
+        <div className="bg"></div>
+        <form>
+          <input type='text' name='name' placeholder='Name'/>
+          <input type='text' name='email' placeholder='Title'/>
+          <textarea name='text' placeholder='Contents'/>
+          <input type='submit' value='submit' className='submit'/>
+        </form>
 
-          <FormControl variant="outlined" fullWidth margin="normal">
-            <InputLabel id="demo-simple-select-outlined-label">공지사항 분류</InputLabel>
-            <Select
-              labelId="demo-simple-select-outlined-label"
-              id="demo-simple-select-outlined"
-              value={this.state.notice_type}
-              onChange={this.onChange}
-              label="Age"
-              name="notice_type"
-            >
-              <MenuItem value="">
-                <em>None</em>
-              </MenuItem>
-              <MenuItem value={'공지사항'}>공지사항</MenuItem>
-              <MenuItem value={'이벤트'}>이벤트</MenuItem>
-              <MenuItem value={'업데이트'}>업데이트</MenuItem>
-              <MenuItem value={'점검'}>점검</MenuItem>
-            </Select>
-          </FormControl>
-          <TextField type="text" placeholder="please input type" name="notice_type" 
-          fullWidth margin="normal" value={this.state.notice_type} onChange={this.onChange} />
-
-          <TextField type="text" placeholder="please input title" name="notice_title" 
-          fullWidth margin="normal" value={this.state.notice_title} onChange={this.onChange} />
-
-          <TextField type="text" placeholder="please input contents" name="notice_contents" 
-          fullWidth margin="normal" value={this.state.notice_contents} onChange={this.onChange} />
-          
-          <Button variant="contained" color="primary" onClick={this.saveNotice}>Save</Button>
-
+        <form style = {{ display : 'flex', flexFlow : 'row wrap', justifyContent : 'center', marginTop:'5px' }}>
+          <select name="notice_type" value={this.state.notice_type} onChange={this.onChange}>
+            <option value="none">공지사항 선택</option>
+            <option value="korean">공지사항</option>
+            <option value="english">이벤트</option>
+            <option value="chinese">업데이트</option>
+            <option value="spanish">점검</option>
+          </select>
+          <input type='text' placeholder="please input type" width='100%'></input>
+          <input type='text' placeholder="please input title"></input>
+          <input type='text' placeholder="please input contents"></input>
         </form>
       </div>
     );
   }
 }
 
-const formContainer = {
-  display : 'flex',
-  flexFlow : 'row wrap'
-}
+// const formContainer = {
+//   display : 'flex',
+//   flexFlow : 'row wrap'
+// }
 
-const style = {
-  display : 'flex',
-  justifyContent : 'center'
-}
+// const style = {
+//   display : 'flex',
+//   justifyContent : 'center',
+//   marginTop:'5px'
+// }
 
 export default AddNoticeComponent;
